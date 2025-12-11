@@ -4,6 +4,7 @@ from .user import User
 from .product import Product
 from .order import Order
 from .time import Time
+from .shift import Shift
 
 # モデルのリストを定義しておくと、後でまとめて登録しやすくなります
 MODELS = [
@@ -11,7 +12,9 @@ MODELS = [
     Product,
     Order,
     Time,
+    Shift,
 ]
+
 
 # データベースの初期化関数
 def initialize_database():
