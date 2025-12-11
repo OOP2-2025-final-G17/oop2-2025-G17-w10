@@ -15,7 +15,7 @@
 
     <form action="{{ url_for('shift.add') }}" method="post">
         <label>名前: <input type="text" name="name" required></label><br>
-        <label>職場: <input type="number" name="workplace" required></label><br>
+        <label>職場: <input type="text" name="workplace" required></label><br>
         <label>日付: <input type="date" name="date" required></label><br>
         <button type="submit">追加</button>
     </form>

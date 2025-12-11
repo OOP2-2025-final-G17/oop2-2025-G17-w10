@@ -15,7 +15,7 @@
 
     <form action="{{ url_for('shift.edit', shift_id=shift.id) }}" method="post">
         <label>名前: <input type="text" name="name" value="{{ shift.name }}" required></label><br>
-        <label>職場: <input type="number" name="workplace" value="{{ shift.workplace }}" required></label><br>
+        <label>職場: <input type="text" name="workplace" value="{{ shift.workplace }}" required></label><br>
         <label>日付: <input type="date" name="date" value="{{ shift.date }}" required></label><br>
         <button type="submit">保存</button>
     </form>
