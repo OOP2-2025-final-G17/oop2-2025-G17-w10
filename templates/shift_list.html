@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>シフト一覧</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='base-style.css') }}">
+</head>
+<body>
+    <h1>{{ title }}</h1>
+    <ul class="breadcrumb">
+        <li><a href="{{ url_for('index') }}">HOME</a></li>
+        <li><a href="{{ url_for('shift.list') }}">シフト一覧</a></li>
+    </ul>
+
+    <a href="{{ url_for('shift.add') }}">新規シフト追加</a>
+    <table>
+        <thead>
+            <tr>
+                <th>&nbsp;</th>
+                <th>名前</th>
+                <th>職場</th>
+                <th>日付</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for shift in items %}
+            <tr>
+                <td><a href="{{ url_for('shift.edit', shift_id=shift.id) }}">編集</a></td>
+                <td>{{ shift.name }}</td>
+                <td>{{ shift.workplace }}</td>
+                <td>{{ shift.date }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

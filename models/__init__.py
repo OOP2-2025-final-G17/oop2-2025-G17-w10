@@ -3,13 +3,16 @@ from .db import db
 from .user import User
 from .product import Product
 from .order import Order
+from .shift import Shift
 
 # モデルのリストを定義しておくと、後でまとめて登録しやすくなります
 MODELS = [
     User,
     Product,
     Order,
+    Shift,
 ]
+
 
 # データベースの初期化関数
 def initialize_database():
