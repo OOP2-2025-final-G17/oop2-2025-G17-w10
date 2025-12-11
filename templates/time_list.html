@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>データ一覧</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='base-style.css') }}">
+</head>
+<body>
+    <h1>{{ title }}</h1>
+    <ul class="breadcrumb">
+        <li><a href="{{ url_for('index') }}">HOME</a></li>
+        <li><a href="{{ url_for('time.list') }}">労働時間一覧</a></li>
+    </ul>
+
+    <a href="{{ url_for('time.add') }}">新規労働時間追加</a>
+
+    <table>
+        <thead>
+            <tr>
+                <th>&nbsp;</th>
+                <th>労働時間名</th>
+                <th>開始時間</th>
+                <th>終了時間</th>
+                <th>休憩開始時間</th>
+                <th>休憩終了時間</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for time in items %}
+            <tr>
+                <td><a href="{{ url_for('time.edit', time_id=time.id) }}">編集</a></td>
+                <td>{{ time.name }}</td>
+                <td>{{ time.start_time }}</td>
+                <td>{{ time.end_time }}</td>
+                <td>{{ time.break_start_time }}</td>
+                <td>{{ time.break_end_time }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
