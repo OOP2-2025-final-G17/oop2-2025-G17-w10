@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>シフト編集</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='base-style.css') }}">
+</head>
+<body>
+    <h1>シフトを編集</h1>
+    <ul class="breadcrumb">
+        <li><a href="{{ url_for('index') }}">HOME</a></li>
+        <li><a href="{{ url_for('shift.list') }}">シフト一覧</a></li>
+        <li>シフト編集</li>
+    </ul>
+
+    <form action="{{ url_for('shift.edit', shift_id=shift.id) }}" method="post">
+        <label>名前: <input type="text" name="name" value="{{ shift.name }}" required></label><br>
+        <label>職場: <input type="number" name="workplace" value="{{ shift.workplace }}" required></label><br>
+        <label>日付: <input type="date" name="date" value="{{ shift.date }}" required></label><br>
+        <button type="submit">保存</button>
+    </form>
+</body>
+</html>
