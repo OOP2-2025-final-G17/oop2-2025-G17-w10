@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>労働時間追加</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='base-style.css') }}">
+</head>
+<body>
+    <h1>新しい労働時間を追加</h1>
+    <ul class="breadcrumb">
+        <li><a href="{{ url_for('index') }}">HOME</a></li>
+        <li><a href="{{ url_for('time.list') }}">労働時間一覧</a></li>
+        <li>新規労働時間設定</li>
+    </ul>
+
+    <form action="{{ url_for('time.add') }}" method="post">
+        <label>時間名:
+            <input type="text" name="name" required>
+        </label><br>
+
+        <label>開始時間:
+            <input type="time" name="start_time" required>
+        </label><br>
+
+        <label>終了時間:
+            <input type="time" name="end_time" required>
+        </label><br>
+
+        <label>休憩開始時間:
+            <input type="time" name="break_start_time">
+        </label><br>
+
+        <label>休憩終了時間:
+            <input type="time" name="break_end_time">
+        </label><br>
+
+        <button type="submit">保存</button>
+    </form>
+</body>
+</html>
