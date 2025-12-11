@@ -2,7 +2,6 @@ from peewee import SqliteDatabase
 from .db import db
 from .user import User
 from .product import Product
-from .order import Order
 from .time import Time
 from .shift import Shift
 
@@ -10,7 +9,6 @@ from .shift import Shift
 MODELS = [
     User,
     Product,
-    Order,
     Time,
     Shift,
 ]
