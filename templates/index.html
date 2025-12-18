@@ -20,6 +20,28 @@
         </ul>
     </section>
 
+        <div>
+{% if today_shifts %}
+<table border="1">
+    <tr>
+        <th>名前</th>
+        <th>職場ID</th>
+        <th>日付</th>
+    </tr>
+
+    {% for s in today_shifts %}
+    <tr>
+        <td>{{ s.user.name }}</td>
+<td>{{ s.workplace.name }}</td>
+<td>{{ s.date }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% else %}
+<p>今日はシフトがありません。</p>
+{% endif %}
+  </div>
     <hr>
 
     <section id="report-section">
