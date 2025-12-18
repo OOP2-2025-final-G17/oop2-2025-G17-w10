@@ -8,152 +8,193 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
+
 <body>
-  
-    <h1>シフト管理システム</h1>
-    
-    <section id="main-nav">
+  <div class="layout">
+
+    <!-- ================= 左：サイドバー（リンクのみ） ================= -->
+    <aside class="sidebar">
+      <h1>シフト管理</h1>
+      <nav>
         <ul>
-            <li><a href="{{ url_for('user.list') }}">ユーザー</a></li>
-            <li><a href="{{ url_for('workplace.list') }}">職場</a></li>
-            <li><a href="{{ url_for('time.list') }}">労働時間</a></li>
-            <li><a href="{{ url_for('shift.list') }}">シフト管理</a></li>
+          <li><a href="{{ url_for('user.list') }}">ユーザー</a></li>
+          <li><a href="{{ url_for('workplace.list') }}">職場</a></li>
+          <li><a href="{{ url_for('time.list') }}">労働時間</a></li>
+          <li><a href="{{ url_for('shift.list') }}">シフト管理</a></li>
         </ul>
-        <h2>{{ today }} のシフト</h2>
-    </section>
+      </nav>
+    </aside>
 
-        <div>
-{% if today_shifts %}
-<table border="1">
-    <tr>
-        <th>名前</th>
-        <th>職場ID</th>
-        <th>日付</th>
-    </tr>
+    <!-- ================= 右：メイン ================= -->
+    <main class="main">
+      <div class="main-grid">
 
-    {% for s in today_shifts %}
-    <tr>
-        <td>{{ s.user.name }}</td>
-<td>{{ s.workplace.name }}</td>
-<td>{{ s.date }}</td>
-    </tr>
-    {% endfor %}
-</table>
+        <!-- ===== 右 左上：今日のシフト ===== -->
+        <section class="card">
+          <h2>{{ today }} のシフト</h2>
 
-{% else %}
-<p>今日はシフトがありません。</p>
-{% endif %}
-  </div>
-    <hr>
+          {% if today_shifts %}
+          <table>
+            <thead>
+              <tr>
+                <th>名前</th>
+                <th>職場</th>
+                <th>日付</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for s in today_shifts %}
+              <tr>
+                <td>{{ s.user.name }}</td>
+                <td>{{ s.workplace.name }}</td>
+                <td>{{ s.date }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+            <p>今日はシフトがありません。</p>
+          {% endif %}
+        </section>
 
-    <section id="report-section">
-        <h2>勤務時間・給与集計</h2>
-        
-        <form method="post" action="">
+        <!-- ===== 右 右上：空き（将来追加用） ===== -->
+        <section class="card">
+          <h2>予備エリア</h2>
+          <p>ここは後で追加</p>
+        </section>
+
+        <!-- ===== 横一面：勤務時間・給与集計 ===== -->
+        <section class="card wide" id="report-section">
+          <h2>勤務時間・給与集計</h2>
+
+          <form method="post">
             <label>ユーザー:
-                <select name="user_id">
-                    <option value="">-- 選択してください --</option>
-                    {% for u in users %}
-                        <option value="{{ u.id }}" {% if u.id == user_id %}selected{% endif %}>{{ u.name }}</option>
-                    {% endfor %}
-                </select>
+              <select name="user_id">
+                <option value="">-- 選択してください --</option>
+                {% for u in users %}
+                  <option value="{{ u.id }}" {% if u.id == user_id %}selected{% endif %}>
+                    {{ u.name }}
+                  </option>
+                {% endfor %}
+              </select>
             </label>
+
             <label>年:
-                <select name="year">
-                    {% for y in year_options %}
-                        <option value="{{ y }}" {% if y == year %}selected{% endif %}>{{ y }}</option>
-                    {% endfor %}
-                </select>
+              <select name="year">
+                {% for y in year_options %}
+                  <option value="{{ y }}" {% if y == year %}selected{% endif %}>{{ y }}</option>
+                {% endfor %}
+              </select>
             </label>
+
             <label>月:
-                <select name="month">
-                    {% for m in month_options %}
-                        <option value="{{ m }}" {% if m == month %}selected{% endif %}>{{ m }}</option>
-                    {% endfor %}
-                </select>
+              <select name="month">
+                {% for m in month_options %}
+                  <option value="{{ m }}" {% if m == month %}selected{% endif %}>{{ m }}</option>
+                {% endfor %}
+              </select>
             </label>
+
             <button type="submit">表示</button>
-        </form>
+          </form>
 
-        <div id="report-content">
+          <div id="report-content">
             <div id="report-tables">
-                {% if monthly_row %}
-                <div id="monthly-table">
-                    <h3>{{ year }}年 {{ month }}月の集計</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ユーザー</th>
-                                <th>合計勤務時間 (h)</th>
-                                <th>推定給与 (円)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>{{ monthly_row.user.name }}</td>
-                                <td style="text-align:right">{{ monthly_row.hours }}</td>
-                                <td style="text-align:right">{{ monthly_row.salary }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+              {% if monthly_row %}
+                <h3>{{ year }}年 {{ month }}月</h3>
+                <table>
+                  <tr>
+                    <th>ユーザー</th>
+                    <th>勤務時間</th>
+                    <th>給与</th>
+                  </tr>
+                  <tr>
+                    <td>{{ monthly_row.user.name }}</td>
+                    <td style="text-align:right">{{ monthly_row.hours }}</td>
+                    <td style="text-align:right">{{ monthly_row.salary }}</td>
+                  </tr>
+                </table>
 
-                <div id="ytd-table">
-                    <h3>{{ year }}年1月からの年初来合計</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ユーザー</th>
-                                <th>合計勤務時間 (h)</th>
-                                <th>推定給与 (円)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>{{ ytd_row.user.name }}</td>
-                                <td style="text-align:right">{{ ytd_row.hours }}</td>
-                                <td style="text-align:right">{{ ytd_row.salary }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                {% else %}
-                <div id="all-users-list">
-                    <h3>{{ year }}年 {{ month }}月のユーザー別集計</h3>
-                    <div class="scroll-table">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>ユーザー</th>
-                                    <th>合計勤務時間 (h)</th>
-                                    <th>推定給与 (円)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for row in all_users_monthly_rows %}
-                                <tr>
-                                    <td>{{ row.user.name }}</td>
-                                    <td style="text-align:right">{{ row.hours }}</td>
-                                    <td style="text-align:right">{{ row.salary }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                {% endif %}
+                <h3>年初来</h3>
+                <table>
+                  <tr>
+                    <th>ユーザー</th>
+                    <th>勤務時間</th>
+                    <th>給与</th>
+                  </tr>
+                  <tr>
+                    <td>{{ ytd_row.user.name }}</td>
+                    <td style="text-align:right">{{ ytd_row.hours }}</td>
+                    <td style="text-align:right">{{ ytd_row.salary }}</td>
+                  </tr>
+                </table>
+              {% else %}
+                <h3>{{ year }}年 {{ month }}月 ユーザー別</h3>
+                <table>
+                  <tr>
+                    <th>ユーザー</th>
+                    <th>勤務時間</th>
+                    <th>給与</th>
+                  </tr>
+                  {% for row in all_users_monthly_rows %}
+                  <tr>
+                    <td>{{ row.user.name }}</td>
+                    <td style="text-align:right">{{ row.hours }}</td>
+                    <td style="text-align:right">{{ row.salary }}</td>
+                  </tr>
+                  {% endfor %}
+                </table>
+              {% endif %}
             </div>
 
             <div id="salary-chart-container">
-                <h3>給与グラフ</h3>
-                <canvas id="salaryChart"></canvas>
+              <h3>給与グラフ</h3>
+              <canvas id="salaryChart"></canvas>
             </div>
-        </div>
-    </section>
+          </div>
+        </section>
 
-    <!-- 他のセクションがここに追加可能 -->
+        <!-- ===== 下段 左 ===== -->
+        <section class="card">
+          {% if groups %}
+            <ul>
+              {% for g in groups %}
+                <li>
+                  {{ g.workplace }}
+                  <ul>
+                    {% for user_name in g.users %}
+                      <li>{{ user_name }}</li>
+                    {% endfor %}
+                  </ul>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p>まだシフトが登録されていません。</p>
+          {% endif %}
+        </section>
 
-    <script>
+        <!-- ===== 下段 右 ===== -->
+        <section class="card">
+          {% if groups %}
+            <canvas
+              id="radarChart"
+              data-labels='{{ chart_labels | safe }}'
+              data-values='{{ chart_data | safe }}'>
+            </canvas>
+          {% else %}
+            <p>シフトがないためグラフを表示できません。</p>
+          {% endif %}
+        </section>
+
+      </div>
+
+      <script src="{{ url_for('static', filename='scripts/workplace.js') }}"></script>
+    </main>
+
+  </div>
+  <script>
         // Chart.js 給与グラフ描画（全ユーザー）
         const ctx = document.getElementById('salaryChart');
         if (ctx) {
@@ -201,7 +242,7 @@
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: true,
+                    maintainAspectRatio: false,
                     scales: {
                         y: {
                             beginAtZero: true,
@@ -236,39 +277,7 @@
             });
         }
     </script>
-    
-    <div>
-      {% if groups %}
-        <ul>
-          {% for g in groups %}
-            <li>
-              {{ g.workplace }}:
-              <ul>
-                {% for user_name in g.users %}
-                  <li>{{ user_name }}</li>
-                {% endfor %}
-              </ul>
-            </li>
-          {% endfor %}
-        </ul>
-      {% else %}
-        <p>まだシフトが登録されていません。</p>
-      {% endif %}
-    </div>
-    <div>
-       {% if groups %}
-        <canvas
-          id="radarChart"
-          data-labels='{{ chart_labels | safe }}'
-          data-values='{{ chart_data | safe }}'>
-        </canvas>
-        {% else %}
-          <p>シフトがないためグラフを表示できません。</p>
-        {% endif %}
-        
-      </div>
-
-      <script src="{{ url_for('static', filename='scripts/workplace.js') }}"></script>
-    </div>
 </body>
+
+
 </html>
