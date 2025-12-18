@@ -5,12 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>シフト管理システム</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='base-style.css') }}">
+    <!-- FullCalendar -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.13/index.global.min.js"></script>
+
+    <style>
+        /* カレンダーの大きさ調整と中央寄せ */
+        #calendar {
+            max-width: 600px;   /* 横幅 */
+            margin: 40px auto;  /* 上下マージン 40px、左右中央寄せ */
+        }
+    </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 
 <body>
+   
   <div class="layout">
 
     <!-- ================= 左：サイドバー（リンクのみ） ================= -->
@@ -60,8 +71,25 @@
 
         <!-- ===== 右 右上：空き（将来追加用） ===== -->
         <section class="card">
-          <h2>予備エリア</h2>
-          <p>ここは後で追加</p>
+          <h2>カレンダーシフト表</h2>
+
+    <!-- カレンダー描画用の div -->
+    <div id="calendar"></div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+
+        // Python から渡されたシフトデータを FullCalendar に渡す
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            height: 600,
+            events: {{ shifts | default([]) | tojson }} // title に名前+職場が表示される
+        });
+
+        calendar.render();
+    });
+    </script>
         </section>
 
         <!-- ===== 横一面：勤務時間・給与集計 ===== -->
