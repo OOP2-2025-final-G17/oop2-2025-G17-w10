@@ -14,5 +14,28 @@
       <li><a href="{{ url_for('order.list') }}">注文</a></li>
       <li><a href="{{ url_for('shift.list') }}">シフト管理</a></li>
     </ul>
+    <h2>{{ today }} のシフト</h2>
+
+{% if today_shifts %}
+<table border="1">
+    <tr>
+        <th>名前</th>
+        <th>職場ID</th>
+        <th>日付</th>
+    </tr>
+
+    {% for s in today_shifts %}
+    <tr>
+        <td>{{ s.name }}</td>
+        <td>{{ s.workplace }}</td>
+        <td>{{ s.date }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% else %}
+<p>今日はシフトがありません。</p>
+{% endif %}
+
 </body>
 </html>
