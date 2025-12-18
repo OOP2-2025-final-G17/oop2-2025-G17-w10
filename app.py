@@ -32,6 +32,7 @@ for blueprint in blueprints:
 # ホームページのルート
 @app.route("/", methods=["GET", "POST"])
 def index():
+    today_date = date.today()            
     today = date.today()
 
     # POSTリクエスト時にセッションに値を保存
@@ -99,6 +100,8 @@ def index():
     chart_data = [len(uids) for uids in workplace_to_users.values()]
 
 
+    shifts = Shift.select().where(Shift.date == today_date).join(Workplace).switch(Shift).join(User).order_by(Workplace.name, User.name,Shift.date)
+
     return render_template(
         "index.html",
         title="シフト管理システム",
@@ -115,10 +118,10 @@ def index():
         user_names_json=user_names_json,
         groups=groups,
         chart_labels=json.dumps(chart_labels, ensure_ascii=False),
-        chart_data=json.dumps(chart_data)
+        chart_data=json.dumps(chart_data),
+        today=today_date,
+        today_shifts=shifts,
     )
-
-
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080, debug=True)
