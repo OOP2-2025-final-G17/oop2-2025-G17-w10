@@ -2,6 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>シフト管理システム</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='base-style.css') }}">
     <!-- FullCalendar -->
@@ -14,18 +15,63 @@
             margin: 40px auto;  /* 上下マージン 40px、左右中央寄せ */
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
+
 <body>
-    <h1>シフト管理システム</h1>
+   
+  <div class="layout">
 
-    <ul>
-        <li><a href="{{ url_for('user.list') }}">ユーザー（顧客）</a></li>
-        <li><a href="{{ url_for('workplace.list') }}">職場</a></li>
-        <li><a href="{{ url_for('time.list') }}">労働時間</a></li>
-        <li><a href="{{ url_for('shift.list') }}">シフト管理</a></li>
-    </ul>
+    <!-- ================= 左：サイドバー（リンクのみ） ================= -->
+    <aside class="sidebar">
+      <h1>シフト管理</h1>
+      <nav>
+        <ul>
+          <li><a href="{{ url_for('user.list') }}">ユーザー</a></li>
+          <li><a href="{{ url_for('workplace.list') }}">職場</a></li>
+          <li><a href="{{ url_for('time.list') }}">労働時間</a></li>
+          <li><a href="{{ url_for('shift.list') }}">シフト管理</a></li>
+        </ul>
+      </nav>
+    </aside>
 
-    <h2>カレンダーシフト表</h2>
+    <!-- ================= 右：メイン ================= -->
+    <main class="main">
+      <div class="main-grid">
+
+        <!-- ===== 右 左上：今日のシフト ===== -->
+        <section class="card">
+          <h2>{{ today }} のシフト</h2>
+
+          {% if today_shifts %}
+          <table>
+            <thead>
+              <tr>
+                <th>名前</th>
+                <th>職場</th>
+                <th>日付</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for s in today_shifts %}
+              <tr>
+                <td>{{ s.user.name }}</td>
+                <td>{{ s.workplace.name }}</td>
+                <td>{{ s.date }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+            <p>今日はシフトがありません。</p>
+          {% endif %}
+        </section>
+
+        <!-- ===== 右 右上：空き（将来追加用） ===== -->
+        <section class="card">
+          <h2>カレンダーシフト表</h2>
 
     <!-- カレンダー描画用の div -->
     <div id="calendar"></div>
@@ -44,5 +90,222 @@
         calendar.render();
     });
     </script>
+        </section>
+
+        <!-- ===== 横一面：勤務時間・給与集計 ===== -->
+        <section class="card wide" id="report-section">
+          <h2>勤務時間・給与集計</h2>
+
+          <form method="post">
+            <label>ユーザー:
+              <select name="user_id">
+                <option value="">-- 選択してください --</option>
+                {% for u in users %}
+                  <option value="{{ u.id }}" {% if u.id == user_id %}selected{% endif %}>
+                    {{ u.name }}
+                  </option>
+                {% endfor %}
+              </select>
+            </label>
+
+            <label>年:
+              <select name="year">
+                {% for y in year_options %}
+                  <option value="{{ y }}" {% if y == year %}selected{% endif %}>{{ y }}</option>
+                {% endfor %}
+              </select>
+            </label>
+
+            <label>月:
+              <select name="month">
+                {% for m in month_options %}
+                  <option value="{{ m }}" {% if m == month %}selected{% endif %}>{{ m }}</option>
+                {% endfor %}
+              </select>
+            </label>
+
+            <button type="submit">表示</button>
+          </form>
+
+          <div id="report-content">
+            <div id="report-tables">
+              {% if monthly_row %}
+                <h3>{{ year }}年 {{ month }}月</h3>
+                <table>
+                  <tr>
+                    <th>ユーザー</th>
+                    <th>勤務時間</th>
+                    <th>給与</th>
+                  </tr>
+                  <tr>
+                    <td>{{ monthly_row.user.name }}</td>
+                    <td style="text-align:right">{{ monthly_row.hours }}</td>
+                    <td style="text-align:right">{{ monthly_row.salary }}</td>
+                  </tr>
+                </table>
+
+                <h3>年初来</h3>
+                <table>
+                  <tr>
+                    <th>ユーザー</th>
+                    <th>勤務時間</th>
+                    <th>給与</th>
+                  </tr>
+                  <tr>
+                    <td>{{ ytd_row.user.name }}</td>
+                    <td style="text-align:right">{{ ytd_row.hours }}</td>
+                    <td style="text-align:right">{{ ytd_row.salary }}</td>
+                  </tr>
+                </table>
+              {% else %}
+                <h3>{{ year }}年 {{ month }}月 ユーザー別</h3>
+                <table>
+                  <tr>
+                    <th>ユーザー</th>
+                    <th>勤務時間</th>
+                    <th>給与</th>
+                  </tr>
+                  {% for row in all_users_monthly_rows %}
+                  <tr>
+                    <td>{{ row.user.name }}</td>
+                    <td style="text-align:right">{{ row.hours }}</td>
+                    <td style="text-align:right">{{ row.salary }}</td>
+                  </tr>
+                  {% endfor %}
+                </table>
+              {% endif %}
+            </div>
+
+            <div id="salary-chart-container">
+              <h3>給与グラフ</h3>
+              <canvas id="salaryChart"></canvas>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== 下段 左 ===== -->
+        <section class="card">
+          {% if groups %}
+            <ul>
+              {% for g in groups %}
+                <li>
+                  {{ g.workplace }}
+                  <ul>
+                    {% for user_name in g.users %}
+                      <li>{{ user_name }}</li>
+                    {% endfor %}
+                  </ul>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p>まだシフトが登録されていません。</p>
+          {% endif %}
+        </section>
+
+        <!-- ===== 下段 右 ===== -->
+        <section class="card">
+          {% if groups %}
+            <canvas
+              id="radarChart"
+              data-labels='{{ chart_labels | safe }}'
+              data-values='{{ chart_data | safe }}'>
+            </canvas>
+          {% else %}
+            <p>シフトがないためグラフを表示できません。</p>
+          {% endif %}
+        </section>
+
+      </div>
+
+      <script src="{{ url_for('static', filename='scripts/workplace.js') }}"></script>
+    </main>
+
+  </div>
+  <script>
+        // Chart.js 給与グラフ描画（全ユーザー）
+        const ctx = document.getElementById('salaryChart');
+        if (ctx) {
+            const userNames = {{ user_names_json | safe }};
+            const monthlySalaries = {{ monthly_salary_json | safe }};
+            const ytdSalaries = {{ ytd_salary_json | safe }};
+            
+            // カラーパレット
+            const colors = [
+                'rgba(54, 162, 235, 0.7)',
+                'rgba(75, 192, 75, 0.7)',
+                'rgba(255, 99, 132, 0.7)',
+                'rgba(255, 159, 64, 0.7)',
+                'rgba(153, 102, 255, 0.7)',
+                'rgba(255, 159, 192, 0.7)',
+                'rgba(201, 203, 207, 0.7)',
+            ];
+            const borderColors = [
+                'rgba(54, 162, 235, 1)',
+                'rgba(75, 192, 75, 1)',
+                'rgba(255, 99, 132, 1)',
+                'rgba(255, 159, 64, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 192, 1)',
+                'rgba(201, 203, 207, 1)',
+            ];
+            
+            // データセット作成
+            const datasets = userNames.map((name, idx) => ({
+                label: name,
+                data: [monthlySalaries[idx], ytdSalaries[idx]],
+                backgroundColor: colors[idx % colors.length],
+                borderColor: borderColors[idx % borderColors.length],
+                borderWidth: 1,
+            }));
+            
+            const chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [
+                        '{{ year }}年{{ month }}月',
+                        '{{ year }}年1月からの累計'
+                    ],
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '¥' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            onClick: (e, legendItem, legend) => {
+                                const index = legendItem.datasetIndex;
+                                const chart = legend.chart;
+                                const meta = chart.getDatasetMeta(index);
+                                meta.hidden = meta.hidden === null ? true : !meta.hidden;
+                                chart.update();
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ¥' + context.parsed.y.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
 </body>
+
+
 </html>
