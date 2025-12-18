@@ -13,5 +13,23 @@
       <li><a href="{{ url_for('time.list') }}">労働時間</a></li>
       <li><a href="{{ url_for('shift.list') }}">シフト管理</a></li>
     </ul>
+    <div>
+      {% if groups %}
+        <ul>
+          {% for g in groups %}
+            <li>
+              {{ g.workplace }}:
+              <ul>
+                {% for user_name in g.users %}
+                  <li>{{ user_name }}</li>
+                {% endfor %}
+              </ul>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>まだシフトが登録されていません。</p>
+      {% endif %}
+    </div>
 </body>
 </html>
