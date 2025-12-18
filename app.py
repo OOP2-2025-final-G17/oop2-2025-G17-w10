@@ -66,6 +66,7 @@ def index():
     month_options = list(range(1, 13))
 
     # 全ユーザーの月次・年初来給与データ（グラフ用）
+    all_users_monthly_rows = monthly_summary(year, month)
     all_monthly_salaries = all_users_monthly_salary(year, month)
     all_ytd_salaries = all_users_ytd_salary(year, month)
 
@@ -74,31 +75,28 @@ def index():
     ytd_salary_json = json.dumps([s["salary"] for s in all_ytd_salaries])
     user_names_json = json.dumps([s["user_name"] for s in all_monthly_salaries])
 
-    
     query = (
-            Shift
-            .select(Shift, Workplace, User)
-            .join(Workplace)          # Shift.workplace
-            .switch(Shift)
-            .join(User)               # Shift.user
-            .order_by(Workplace.name, User.name)
-        )
+        Shift.select(Shift, Workplace, User)
+        .join(Workplace)  # Shift.workplace
+        .switch(Shift)
+        .join(User)  # Shift.user
+        .order_by(Workplace.name, User.name)
+    )
     workplace_to_users = OrderedDict()
 
     for s in query:
-            wp_name = s.workplace.name
-            if wp_name not in workplace_to_users:
-                workplace_to_users[wp_name] = OrderedDict()
+        wp_name = s.workplace.name
+        if wp_name not in workplace_to_users:
+            workplace_to_users[wp_name] = OrderedDict()
 
-            # 同じ職場に同じ人が複数シフトあっても 1 回だけ表示
-            workplace_to_users[wp_name][s.user.id] = s.user.name
+        # 同じ職場に同じ人が複数シフトあっても 1 回だけ表示
+        workplace_to_users[wp_name][s.user.id] = s.user.name
     groups = [
-            {"workplace": wp_name, "users": list(users.values())}
-            for wp_name, users in workplace_to_users.items()
-        ]
+        {"workplace": wp_name, "users": list(users.values())}
+        for wp_name, users in workplace_to_users.items()
+    ]
     chart_labels = list(workplace_to_users.keys())
     chart_data = [len(uids) for uids in workplace_to_users.values()]
-
 
     shifts = Shift.select().where(Shift.date == today_date).join(Workplace).switch(Shift).join(User).order_by(Workplace.name, User.name,Shift.date)
 
@@ -111,6 +109,7 @@ def index():
         user_id=user_id,
         monthly_row=monthly_row,
         ytd_row=ytd_row,
+        all_users_monthly_rows=all_users_monthly_rows,
         year_options=year_options,
         month_options=month_options,
         monthly_salary_json=monthly_salary_json,

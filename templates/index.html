@@ -76,11 +76,52 @@
             <button type="submit">表示</button>
         </form>
 
-        {% if monthly_row %}
-            <div id="report-content">
-                <div id="report-tables">
-                    <div id="monthly-table">
-                        <h3>{{ year }}年 {{ month }}月の集計</h3>
+        <div id="report-content">
+            <div id="report-tables">
+                {% if monthly_row %}
+                <div id="monthly-table">
+                    <h3>{{ year }}年 {{ month }}月の集計</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ユーザー</th>
+                                <th>合計勤務時間 (h)</th>
+                                <th>推定給与 (円)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ monthly_row.user.name }}</td>
+                                <td style="text-align:right">{{ monthly_row.hours }}</td>
+                                <td style="text-align:right">{{ monthly_row.salary }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="ytd-table">
+                    <h3>{{ year }}年1月からの年初来合計</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ユーザー</th>
+                                <th>合計勤務時間 (h)</th>
+                                <th>推定給与 (円)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ ytd_row.user.name }}</td>
+                                <td style="text-align:right">{{ ytd_row.hours }}</td>
+                                <td style="text-align:right">{{ ytd_row.salary }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div id="all-users-list">
+                    <h3>{{ year }}年 {{ month }}月のユーザー別集計</h3>
+                    <div class="scroll-table">
                         <table>
                             <thead>
                                 <tr>
@@ -90,44 +131,25 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                {% for row in all_users_monthly_rows %}
                                 <tr>
-                                    <td>{{ monthly_row.user.name }}</td>
-                                    <td style="text-align:right">{{ monthly_row.hours }}</td>
-                                    <td style="text-align:right">{{ monthly_row.salary }}</td>
+                                    <td>{{ row.user.name }}</td>
+                                    <td style="text-align:right">{{ row.hours }}</td>
+                                    <td style="text-align:right">{{ row.salary }}</td>
                                 </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div id="ytd-table">
-                        <h3>{{ year }}年1月からの年初来合計</h3>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>ユーザー</th>
-                                    <th>合計勤務時間 (h)</th>
-                                    <th>推定給与 (円)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>{{ ytd_row.user.name }}</td>
-                                    <td style="text-align:right">{{ ytd_row.hours }}</td>
-                                    <td style="text-align:right">{{ ytd_row.salary }}</td>
-                                </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
                 </div>
-
-                <div id="salary-chart-container">
-                    <h3>給与グラフ</h3>
-                    <canvas id="salaryChart"></canvas>
-                </div>
+                {% endif %}
             </div>
-        {% else %}
-            <p>ユーザーを選択してください</p>
-        {% endif %}
+
+            <div id="salary-chart-container">
+                <h3>給与グラフ</h3>
+                <canvas id="salaryChart"></canvas>
+            </div>
+        </div>
     </section>
 
     <!-- 他のセクションがここに追加可能 -->
