@@ -6,6 +6,7 @@
     <title>シフト管理システム</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='base-style.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <h1>シフト管理システム</h1>
@@ -189,5 +190,39 @@
             });
         }
     </script>
+    
+    <div>
+      {% if groups %}
+        <ul>
+          {% for g in groups %}
+            <li>
+              {{ g.workplace }}:
+              <ul>
+                {% for user_name in g.users %}
+                  <li>{{ user_name }}</li>
+                {% endfor %}
+              </ul>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>まだシフトが登録されていません。</p>
+      {% endif %}
+    </div>
+    <div>
+       {% if groups %}
+        <canvas
+          id="radarChart"
+          data-labels='{{ chart_labels | safe }}'
+          data-values='{{ chart_data | safe }}'>
+        </canvas>
+        {% else %}
+          <p>シフトがないためグラフを表示できません。</p>
+        {% endif %}
+        
+      </div>
+
+      <script src="{{ url_for('static', filename='scripts/workplace.js') }}"></script>
+    </div>
 </body>
 </html>
