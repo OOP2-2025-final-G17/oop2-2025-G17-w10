@@ -21,6 +21,7 @@
         </ul>
         <h2>{{ today }} のシフト</h2>
     </section>
+
     <div>
 {% if today_shifts %}
 <table border="1">
@@ -32,9 +33,9 @@
 
     {% for s in today_shifts %}
     <tr>
-        <td>{{ s.name }}</td>
-        <td>{{ s.workplace }}</td>
-        <td>{{ s.date }}</td>
+        <td>{{ s.user.name }}</td>
+<td>{{ s.workplace.name }}</td>
+<td>{{ s.date }}</td>
     </tr>
     {% endfor %}
 </table>
