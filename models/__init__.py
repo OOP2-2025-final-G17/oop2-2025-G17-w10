@@ -1,16 +1,14 @@
 from peewee import SqliteDatabase
 from .db import db
 from .user import User
-from .workplace import workplace
-from .order import Order
+from .workplace import Workplace
 from .time import Time
 from .shift import Shift
 
 # モデルのリストを定義しておくと、後でまとめて登録しやすくなります
 MODELS = [
     User,
-    workplace,
-    Order,
+    Workplace,
     Time,
     Shift,
 ]

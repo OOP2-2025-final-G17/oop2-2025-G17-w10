@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for
-from models import shift, Time, User, workplace
+from models import Shift, Time, User, Workplace
 from datetime import datetime
 
 # Blueprintの作成
@@ -8,7 +8,7 @@ shift_bp = Blueprint("shift", __name__, url_prefix="/shifts")
 
 @shift_bp.route("/")
 def list():
-    shifts = shift.Shift.select()
+    shifts = Shift.select()
     return render_template("shift_list.html", title="シフト一覧", items=shifts)
 
 
@@ -19,12 +19,10 @@ def add():
         workplace_id = request.form["workplace_id"]
         date = request.form["date"]
         time_id = request.form["time_id"]
-        shift.Shift.create(
-            user=user_id, workplace=workplace_id, date=date, time=time_id
-        )
+        Shift.create(user=user_id, workplace=workplace_id, date=date, time=time_id)
         return redirect(url_for("shift.list"))
     users = User.select()
-    workplaces = workplace.select()
+    workplaces = Workplace.select()
     times = Time.select()
     return render_template(
         "shift_add.html", users=users, workplaces=workplaces, times=times
@@ -33,7 +31,7 @@ def add():
 
 @shift_bp.route("/edit/<int:shift_id>", methods=["GET", "POST"])
 def edit(shift_id):
-    shift_instance = shift.Shift.get_or_none(shift.Shift.id == shift_id)
+    shift_instance = Shift.get_or_none(Shift.id == shift_id)
     if not shift_instance:
         return redirect(url_for("shift.list"))
     if request.method == "POST":
@@ -44,7 +42,7 @@ def edit(shift_id):
         shift_instance.save()
         return redirect(url_for("shift.list"))
     users = User.select()
-    workplaces = workplace.select()
+    workplaces = Workplace.select()
     times = Time.select()
     return render_template(
         "shift_edit.html",
