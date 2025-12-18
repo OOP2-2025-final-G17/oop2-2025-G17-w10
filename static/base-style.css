@@ -174,7 +174,7 @@ select, button {
 
 .card canvas{
   width: 100% !important;
-  height: auto !important;
+  
 }
 
 @media (max-width: 980px){
@@ -188,3 +188,67 @@ select, button {
   .main-grid{ grid-template-columns: 1fr; }
 }
 /* ===== 新レイアウトここまで ===== */
+/* ====== ここから追記（横一面を確実にする） ====== */
+
+/* 右エリアの2カラム */
+.main-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+/* 「wide」を main-grid 直下で強制的に2列ぶち抜く */
+.main-grid > .wide{
+  grid-column: 1 / -1 !important;
+  width: 100%;
+  min-width: 0;
+}
+
+/* wideの中（給与集計）を、左:表 右:グラフ の2分割にする
+   ※ 既存の #report-content flex をやめて grid に上書き */
+.wide #report-content{
+  display: grid !important;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+/* 中の固定幅指定を解除（これがあると詰まって見える） */
+.wide #report-tables,
+.wide #salary-chart-container{
+  flex: initial !important;
+  min-width: 0 !important;
+  width: 100% !important;
+}
+
+/* グラフキャンバスが横幅いっぱいになるように */
+#salaryChart,
+#radarChart{
+  width: 100% !important;
+  height: auto !important;
+}
+
+/* 画面が狭い時は縦積み */
+@media (max-width: 980px){
+  .main-grid{ grid-template-columns: 1fr; }
+  .wide #report-content{ grid-template-columns: 1fr; }
+}
+
+/* ====== ここまで追記 ====== */
+/* Chart.js用：canvasの高さを潰さない */
+#salary-chart-container {
+  min-height: 360px;
+}
+
+#salaryChart {
+  display: block;
+  width: 100% !important;
+  height: 320px !important;  /* ここが重要 */
+}
+
+#radarChart{
+  display: block;
+  width: 100% !important;
+  height: 320px !important;
+}
