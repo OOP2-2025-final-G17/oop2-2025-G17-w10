@@ -4,15 +4,45 @@
     <meta charset="UTF-8">
     <title>シフト管理システム</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='base-style.css') }}">
+    <!-- FullCalendar -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.13/index.global.min.js"></script>
+
+    <style>
+        /* カレンダーの大きさ調整と中央寄せ */
+        #calendar {
+            max-width: 600px;   /* 横幅 */
+            margin: 40px auto;  /* 上下マージン 40px、左右中央寄せ */
+        }
+    </style>
 </head>
 <body>
     <h1>シフト管理システム</h1>
+
     <ul>
-      <li><a href="{{ url_for('user.list') }}">ユーザー（顧客）</a></li>
-      <li><a href="{{ url_for('workplace.list') }}">職場</a></li>
-      <li><a href="{{ url_for('time.list') }}">労働時間</a></li>
-      <li><a href="{{ url_for('shift.list') }}">シフト管理</a></li>
-      <li><a href="{{ url_for('calendar.index') }}">カレンダーシフト表</a></li>
+        <li><a href="{{ url_for('user.list') }}">ユーザー（顧客）</a></li>
+        <li><a href="{{ url_for('workplace.list') }}">職場</a></li>
+        <li><a href="{{ url_for('time.list') }}">労働時間</a></li>
+        <li><a href="{{ url_for('shift.list') }}">シフト管理</a></li>
     </ul>
+
+    <h2>カレンダーシフト表</h2>
+
+    <!-- カレンダー描画用の div -->
+    <div id="calendar"></div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+
+        // Python から渡されたシフトデータを FullCalendar に渡す
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            height: 600,
+            events: {{ shifts | default([]) | tojson }} // title に名前+職場が表示される
+        });
+
+        calendar.render();
+    });
+    </script>
 </body>
 </html>
