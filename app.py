@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, session
 from datetime import date
 import json
-from services.report import (
+from static.scripts.report import (
     monthly_summary,
     user_monthly_summary,
     user_ytd_summary,
