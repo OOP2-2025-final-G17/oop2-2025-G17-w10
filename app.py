@@ -73,20 +73,7 @@ def index():
     ytd_salary_json = json.dumps([s["salary"] for s in all_ytd_salaries])
     user_names_json = json.dumps([s["user_name"] for s in all_monthly_salaries])
 
-    return render_template(
-        "index.html",
-        title="シフト管理システム",
-        year=year,
-        month=month,
-        users=users,
-        user_id=user_id,
-        monthly_row=monthly_row,
-        ytd_row=ytd_row,
-        year_options=year_options,
-        month_options=month_options,
-        monthly_salary_json=monthly_salary_json,
-        ytd_salary_json=ytd_salary_json,
-        user_names_json=user_names_json,
+    
     query = (
             Shift
             .select(Shift, Workplace, User)
@@ -114,10 +101,23 @@ def index():
 
     return render_template(
         "index.html",
+        title="シフト管理システム",
+        year=year,
+        month=month,
+        users=users,
+        user_id=user_id,
+        monthly_row=monthly_row,
+        ytd_row=ytd_row,
+        year_options=year_options,
+        month_options=month_options,
+        monthly_salary_json=monthly_salary_json,
+        ytd_salary_json=ytd_salary_json,
+        user_names_json=user_names_json,
         groups=groups,
         chart_labels=json.dumps(chart_labels, ensure_ascii=False),
-        chart_data=json.dumps(chart_data),
+        chart_data=json.dumps(chart_data)
     )
+
 
 
 if __name__ == "__main__":
