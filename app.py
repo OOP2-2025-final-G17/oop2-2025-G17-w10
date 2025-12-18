@@ -7,6 +7,7 @@ from models.workplace import Workplace
 from models.time import Time
 from models.shift import Shift
 from collections import OrderedDict
+import json
 
 app = Flask(__name__)
 
@@ -42,9 +43,16 @@ def index():
             {"workplace": wp_name, "users": list(users.values())}
             for wp_name, users in workplace_to_users.items()
         ]
+    chart_labels = list(workplace_to_users.keys())
+    chart_data = [len(uids) for uids in workplace_to_users.values()]
 
 
-    return render_template("index.html", groups=groups)
+    return render_template(
+        "index.html",
+        groups=groups,
+        chart_labels=json.dumps(chart_labels, ensure_ascii=False),
+        chart_data=json.dumps(chart_data),
+    )
 
 
 if __name__ == "__main__":
