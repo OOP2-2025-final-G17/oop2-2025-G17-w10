@@ -23,10 +23,10 @@
             </select>
         </label><br>
         <label>職場:
-            <select name="product_id" required>
+            <select name="workplace_id" required>
                 <option value="">選択してください</option>
-                {% for product in products %}
-                <option value="{{ product.id }}">{{ product.name }}</option>
+                {% for workplace in workplaces %}
+                <option value="{{ workplace.id }}">{{ workplace.name }}</option>
                 {% endfor %}
             </select>
         </label><br>

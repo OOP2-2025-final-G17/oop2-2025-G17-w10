@@ -22,9 +22,9 @@
             </select>
         </label><br>
         <label>製品: 
-            <select name="product_id" required>
-                {% for product in products %}
-                    <option value="{{ product.id }}">{{ product.name }}</option>
+            <select name="workplace_id" required>
+                {% for workplace in workplaces %}
+                    <option value="{{ workplace.id }}">{{ workplace.name }}</option>
                 {% endfor %}
             </select>
         </label><br>

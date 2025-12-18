@@ -1,7 +1,7 @@
 from peewee import SqliteDatabase
 from .db import db
 from .user import User
-from .product import Product
+from .workplace import workplace
 from .order import Order
 from .time import Time
 from .shift import Shift
@@ -9,7 +9,7 @@ from .shift import Shift
 # モデルのリストを定義しておくと、後でまとめて登録しやすくなります
 MODELS = [
     User,
-    Product,
+    workplace,
     Order,
     Time,
     Shift,

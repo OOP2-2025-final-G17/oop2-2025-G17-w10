@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for
-from models import shift, Time, User, Product
+from models import shift, Time, User, workplace
 from datetime import datetime
 
 # Blueprintの作成
@@ -16,16 +16,18 @@ def list():
 def add():
     if request.method == "POST":
         user_id = request.form["user_id"]
-        product_id = request.form["product_id"]
+        workplace_id = request.form["workplace_id"]
         date = request.form["date"]
         time_id = request.form["time_id"]
-        shift.Shift.create(user=user_id, product=product_id, date=date, time=time_id)
+        shift.Shift.create(
+            user=user_id, workplace=workplace_id, date=date, time=time_id
+        )
         return redirect(url_for("shift.list"))
     users = User.select()
-    products = Product.select()
+    workplaces = workplace.select()
     times = Time.select()
     return render_template(
-        "shift_add.html", users=users, products=products, times=times
+        "shift_add.html", users=users, workplaces=workplaces, times=times
     )
 
 
@@ -36,18 +38,18 @@ def edit(shift_id):
         return redirect(url_for("shift.list"))
     if request.method == "POST":
         shift_instance.user = request.form["user_id"]
-        shift_instance.product = request.form["product_id"]
+        shift_instance.workplace = request.form["workplace_id"]
         shift_instance.date = request.form["date"]
         shift_instance.time = request.form["time_id"]
         shift_instance.save()
         return redirect(url_for("shift.list"))
     users = User.select()
-    products = Product.select()
+    workplaces = workplace.select()
     times = Time.select()
     return render_template(
         "shift_edit.html",
         shift=shift_instance,
         users=users,
-        products=products,
+        workplaces=workplaces,
         times=times,
     )
