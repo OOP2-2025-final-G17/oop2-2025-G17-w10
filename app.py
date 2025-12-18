@@ -98,7 +98,25 @@ def index():
     chart_labels = list(workplace_to_users.keys())
     chart_data = [len(uids) for uids in workplace_to_users.values()]
 
-    shifts = Shift.select().where(Shift.date == today_date).join(Workplace).switch(Shift).join(User).order_by(Workplace.name, User.name,Shift.date)
+    today_shifts = Shift.select().where(Shift.date == today_date).join(Workplace).switch(Shift).join(User).order_by(Workplace.name, User.name,Shift.date)
+
+    # カレンダー表示用の全シフトデータを取得
+    all_shift_items = (
+        Shift.select(Shift, User, Workplace, Time)
+             .join(User)
+             .switch(Shift)
+             .join(Workplace)
+             .switch(Shift)
+             .join(Time)
+    )
+
+    # FullCalendar用のJSON形式に変換
+    calendar_shifts = []
+    for shift in all_shift_items:
+        calendar_shifts.append({
+            "title": f"{shift.user.name} ({shift.workplace.name})",
+            "start": str(shift.date)  # YYYY-MM-DD形式
+        })
 
     return render_template(
         "index.html",
@@ -119,7 +137,8 @@ def index():
         chart_labels=json.dumps(chart_labels, ensure_ascii=False),
         chart_data=json.dumps(chart_data),
         today=today_date,
-        today_shifts=shifts,
+        today_shifts=today_shifts,
+        shifts=calendar_shifts,
     )
 
 if __name__ == "__main__":
