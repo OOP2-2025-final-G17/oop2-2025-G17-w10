@@ -9,26 +9,24 @@
     <h1>{{ title }}</h1>
     <ul class="breadcrumb">
         <li><a href="{{ url_for('index') }}">HOME</a></li>
-        <li><a href="{{ url_for('order.list') }}">注文一覧</a></li>
-    </ul>
+        <li><a href="{{ url_for('workplace.list') }}">職場一覧</a></li>
 
-    <a href="{{ url_for('order.add') }}">新規注文追加</a>
+    </ul>
+    <a href="{{ url_for('workplace.add') }}">新規職場追加</a>
     <table>
         <thead>
             <tr>
                 <th>&nbsp;</th>
-                <th>ユーザー</th>
-                <th>製品</th>
-                <th>注文日</th>
+                <th>職場名</th>
+                <th>時給</th>
             </tr>
         </thead>
         <tbody>
-            {% for order in items %}
+            {% for workplace in items %}
             <tr>
-                <td><a href="{{ url_for('order.edit', order_id=order.id) }}">編集</a></td>
-                <td>{{ order.user.name }}</td>
-                <td>{{ order.product.name }}</td>
-                <td>{{ order.order_date }}</td>
+                <td><a href="{{ url_for('workplace.edit', workplace_id=workplace.id) }}">編集</a></td>
+                <td>{{ workplace.name }}</td>
+                <td>{{ workplace.price }}</td>
             </tr>
             {% endfor %}
         </tbody>
