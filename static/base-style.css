@@ -123,3 +123,68 @@ select, button {
 .user-scroll-list li:last-child {
   border-bottom: none;
 }
+/* ===== 新レイアウト（サイドバー + 右2カラム）ここから追記 ===== */
+:root{
+  --sidebar-w: 240px;
+  --gap: 16px;
+  --radius: 12px;
+  --border: 1px solid #ddd;
+}
+
+.layout{
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr;
+  min-height: 100vh;
+  gap: var(--gap);
+}
+
+/* 左 */
+.sidebar{
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  padding: 16px;
+  border-right: var(--border);
+  overflow: auto;
+}
+
+/* 右 */
+.main{
+  padding: 16px;
+}
+
+.main-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 後で 1fr 1fr 1fr に増やせる */
+  gap: var(--gap);
+  align-items: start;
+}
+
+.card{
+  border: var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  overflow: hidden;
+}
+
+.stack{
+  display: grid;
+  gap: var(--gap);
+}
+
+.card canvas{
+  width: 100% !important;
+  height: auto !important;
+}
+
+@media (max-width: 980px){
+  .layout{ grid-template-columns: 1fr; }
+  .sidebar{
+    position: static;
+    height: auto;
+    border-right: none;
+    border-bottom: var(--border);
+  }
+  .main-grid{ grid-template-columns: 1fr; }
+}
+/* ===== 新レイアウトここまで ===== */

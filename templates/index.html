@@ -9,6 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+  
     <h1>シフト管理システム</h1>
     
     <section id="main-nav">
@@ -18,8 +19,32 @@
             <li><a href="{{ url_for('time.list') }}">労働時間</a></li>
             <li><a href="{{ url_for('shift.list') }}">シフト管理</a></li>
         </ul>
+        <h2>{{ today }} のシフト</h2>
     </section>
 
+    <div>
+{% if today_shifts %}
+<table border="1">
+    <tr>
+        <th>名前</th>
+        <th>職場ID</th>
+        <th>日付</th>
+    </tr>
+
+    {% for s in today_shifts %}
+    <tr>
+        <td>{{ s.user.name }}</td>
+<td>{{ s.workplace.name }}</td>
+<td>{{ s.date }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% else %}
+<p>今日はシフトがありません。</p>
+{% endif %}
+  </div>
+  
     <hr>
 
     <section id="report-section">
