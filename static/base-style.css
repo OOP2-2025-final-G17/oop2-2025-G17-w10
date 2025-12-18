@@ -94,3 +94,32 @@ select, button {
   display: flex;
   flex-direction: column;
 }
+
+/* Scrollable user list when no selection */
+#all-users-list {
+  margin-top: 1rem;
+}
+
+.scroll-table {
+  max-height: 12rem;
+  overflow-y: auto;
+}
+
+.user-scroll-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0.5rem 0 0;
+  max-height: 10.5rem; /* 約7行想定、5行超でスクロール */
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.user-scroll-list li {
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid #eee;
+}
+
+.user-scroll-list li:last-child {
+  border-bottom: none;
+}
