@@ -2,20 +2,26 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>注文管理システム</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>シフト管理システム</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='base-style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <h1>注文管理システム</h1>
-    <ul>
-      <li><a href="{{ url_for('user.list') }}">ユーザー（顧客）</a></li>
-      <li><a href="{{ url_for('product.list') }}">職場</a></li>
-      <li><a href="{{ url_for('time.list') }}">労働時間</a></li>
-      <li><a href="{{ url_for('order.list') }}">注文</a></li>
-      <li><a href="{{ url_for('shift.list') }}">シフト管理</a></li>
-    </ul>
-    <h2>{{ today }} のシフト</h2>
-
+  
+    <h1>シフト管理システム</h1>
+    
+    <section id="main-nav">
+        <ul>
+            <li><a href="{{ url_for('user.list') }}">ユーザー</a></li>
+            <li><a href="{{ url_for('workplace.list') }}">職場</a></li>
+            <li><a href="{{ url_for('time.list') }}">労働時間</a></li>
+            <li><a href="{{ url_for('shift.list') }}">シフト管理</a></li>
+        </ul>
+        <h2>{{ today }} のシフト</h2>
+    </section>
+    <div>
 {% if today_shifts %}
 <table border="1">
     <tr>
@@ -36,6 +42,211 @@
 {% else %}
 <p>今日はシフトがありません。</p>
 {% endif %}
+  </div>
+  
+    <hr>
 
+    <section id="report-section">
+        <h2>勤務時間・給与集計</h2>
+        
+        <form method="post" action="">
+            <label>ユーザー:
+                <select name="user_id">
+                    <option value="">-- 選択してください --</option>
+                    {% for u in users %}
+                        <option value="{{ u.id }}" {% if u.id == user_id %}selected{% endif %}>{{ u.name }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label>年:
+                <select name="year">
+                    {% for y in year_options %}
+                        <option value="{{ y }}" {% if y == year %}selected{% endif %}>{{ y }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label>月:
+                <select name="month">
+                    {% for m in month_options %}
+                        <option value="{{ m }}" {% if m == month %}selected{% endif %}>{{ m }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <button type="submit">表示</button>
+        </form>
+
+        {% if monthly_row %}
+            <div id="report-content">
+                <div id="report-tables">
+                    <div id="monthly-table">
+                        <h3>{{ year }}年 {{ month }}月の集計</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ユーザー</th>
+                                    <th>合計勤務時間 (h)</th>
+                                    <th>推定給与 (円)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>{{ monthly_row.user.name }}</td>
+                                    <td style="text-align:right">{{ monthly_row.hours }}</td>
+                                    <td style="text-align:right">{{ monthly_row.salary }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="ytd-table">
+                        <h3>{{ year }}年1月からの年初来合計</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ユーザー</th>
+                                    <th>合計勤務時間 (h)</th>
+                                    <th>推定給与 (円)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>{{ ytd_row.user.name }}</td>
+                                    <td style="text-align:right">{{ ytd_row.hours }}</td>
+                                    <td style="text-align:right">{{ ytd_row.salary }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="salary-chart-container">
+                    <h3>給与グラフ</h3>
+                    <canvas id="salaryChart"></canvas>
+                </div>
+            </div>
+        {% else %}
+            <p>ユーザーを選択してください</p>
+        {% endif %}
+    </section>
+
+    <!-- 他のセクションがここに追加可能 -->
+
+    <script>
+        // Chart.js 給与グラフ描画（全ユーザー）
+        const ctx = document.getElementById('salaryChart');
+        if (ctx) {
+            const userNames = {{ user_names_json | safe }};
+            const monthlySalaries = {{ monthly_salary_json | safe }};
+            const ytdSalaries = {{ ytd_salary_json | safe }};
+            
+            // カラーパレット
+            const colors = [
+                'rgba(54, 162, 235, 0.7)',
+                'rgba(75, 192, 75, 0.7)',
+                'rgba(255, 99, 132, 0.7)',
+                'rgba(255, 159, 64, 0.7)',
+                'rgba(153, 102, 255, 0.7)',
+                'rgba(255, 159, 192, 0.7)',
+                'rgba(201, 203, 207, 0.7)',
+            ];
+            const borderColors = [
+                'rgba(54, 162, 235, 1)',
+                'rgba(75, 192, 75, 1)',
+                'rgba(255, 99, 132, 1)',
+                'rgba(255, 159, 64, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 192, 1)',
+                'rgba(201, 203, 207, 1)',
+            ];
+            
+            // データセット作成
+            const datasets = userNames.map((name, idx) => ({
+                label: name,
+                data: [monthlySalaries[idx], ytdSalaries[idx]],
+                backgroundColor: colors[idx % colors.length],
+                borderColor: borderColors[idx % borderColors.length],
+                borderWidth: 1,
+            }));
+            
+            const chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [
+                        '{{ year }}年{{ month }}月',
+                        '{{ year }}年1月からの累計'
+                    ],
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '¥' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            onClick: (e, legendItem, legend) => {
+                                const index = legendItem.datasetIndex;
+                                const chart = legend.chart;
+                                const meta = chart.getDatasetMeta(index);
+                                meta.hidden = meta.hidden === null ? true : !meta.hidden;
+                                chart.update();
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ¥' + context.parsed.y.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+    
+    <div>
+      {% if groups %}
+        <ul>
+          {% for g in groups %}
+            <li>
+              {{ g.workplace }}:
+              <ul>
+                {% for user_name in g.users %}
+                  <li>{{ user_name }}</li>
+                {% endfor %}
+              </ul>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>まだシフトが登録されていません。</p>
+      {% endif %}
+    </div>
+    <div>
+       {% if groups %}
+        <canvas
+          id="radarChart"
+          data-labels='{{ chart_labels | safe }}'
+          data-values='{{ chart_data | safe }}'>
+        </canvas>
+        {% else %}
+          <p>シフトがないためグラフを表示できません。</p>
+        {% endif %}
+        
+      </div>
+
+      <script src="{{ url_for('static', filename='scripts/workplace.js') }}"></script>
+    </div>
 </body>
 </html>

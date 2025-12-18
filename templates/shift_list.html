@@ -26,9 +26,9 @@
             {% for shift in items %}
             <tr>
                 <td><a href="{{ url_for('shift.edit', shift_id=shift.id) }}">編集</a></td>
-                <td>{{ shift.name }}</td>
-                <td>{{ shift.workplace }}</td>
-                <td>{{ shift.date }}</td>
+                <td>{{ shift.user.name }}</td>
+                <td>{{ shift.workplace.name }}</td>
+                <td>{{ shift.date }},{{ shift.time.start_time }} - {{ shift.time.end_time }}</td>
             </tr>
             {% endfor %}
         </tbody>

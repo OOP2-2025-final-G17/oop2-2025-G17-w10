@@ -14,9 +14,31 @@
     </ul>
 
     <form action="{{ url_for('shift.add') }}" method="post">
-        <label>名前: <input type="text" name="name" required></label><br>
-        <label>職場: <input type="text" name="workplace" required></label><br>
+        <label>名前:
+            <select name="user_id" required>
+                <option value="">選択してください</option>
+                {% for user in users %}
+                <option value="{{ user.id }}">{{ user.name }}</option>
+                {% endfor %}
+            </select>
+        </label><br>
+        <label>職場:
+            <select name="workplace_id" required>
+                <option value="">選択してください</option>
+                {% for workplace in workplaces %}
+                <option value="{{ workplace.id }}">{{ workplace.name }}</option>
+                {% endfor %}
+            </select>
+        </label><br>
         <label>日付: <input type="date" name="date" required></label><br>
+        <label>労働時間:
+            <select name="time_id" required>
+                <option value="">選択してください</option>
+                {% for time in times %}
+                <option value="{{ time.id }}">{{ time.name }} ({{ time.start_time }} - {{ time.end_time }})</option>
+                {% endfor %}
+            </select>
+        </label><br>
         <button type="submit">追加</button>
     </form>
 </body>

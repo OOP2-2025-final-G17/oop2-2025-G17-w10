@@ -9,11 +9,11 @@
     <h1>新しい職場を追加</h1>
     <ul class="breadcrumb">
         <li><a href="{{ url_for('index') }}">HOME</a></li>
-        <li><a href="{{ url_for('product.list') }}">職場一覧</a></li>
+        <li><a href="{{ url_for('workplace.list') }}">職場一覧</a></li>
         <li>新しい職場</li>
     </ul>
 
-    <form action="{{ url_for('product.add') }}" method="post">
+    <form action="{{ url_for('workplace.add') }}" method="post">
         <label>職場名: <input type="text" name="name" required></label><br>
         <label>時給: <input type="number" step="1" name="price" required></label><br>
         <button type="submit">追加</button>
